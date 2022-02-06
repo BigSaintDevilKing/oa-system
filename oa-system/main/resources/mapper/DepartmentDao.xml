@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gcc.oa.dao.DepartmentDao">
+
+    <resultMap type="com.gcc.oa.dto.response.DepartmentRespDTO" id="DepartmentMap">
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="DepartmentMap">
+        select dep_id,
+               name,
+               address,
+               status
+        from department
+        where dep_id = #{depId}
+    </select>
+
+    <select id="queryPageList" resultType="com.gcc.oa.dto.response.DepartmentRespDTO">
+        SELECT dep_id,
+        name,
+        address,
+        status
+        FROM department ${ew.customSqlSegment}
+        <!--        <where>-->
+        <!--            <if test="name != null and name != ''">-->
+        <!--                AND name LIKE CONCAT('%',#{name},'%')-->
+        <!--            </if>-->
+        <!--            <if test="address != null and address != ''">-->
+        <!--                AND address LIKE CONCAT('%',#{address},'%')-->
+        <!--            </if>-->
+        <!--            <if test="status != null and status != ''">-->
+        <!--                AND status = #{status}-->
+        <!--            </if>-->
+        <!--        </where>-->
+    </select>
+
+    <update id="updateStatusToOFF">
+        UPDATE department
+        SET `status` = 0
+        WHERE dep_Id = #{depId}
+    </update>
+
+    <update id="updateStatusToON">
+        UPDATE department
+        SET `status` = 1
+        WHERE dep_Id = #{depId}
+    </update>
+
+    <update id="updateDepartment" parameterType="com.gcc.oa.dto.request.DepartmentReqDTO">
+        UPDATE `department`
+        SET `name`    = #{name},
+            `address` = #{address},
+            `status`  = #{status}
+        WHERE `dep_id` = #{depId}
+    </update>
+
+    <insert id="addDepartment" parameterType="com.gcc.oa.dto.request.DepartmentReqDTO" useGeneratedKeys="true">
+        INSERT INTO `department` (`name`, `address`, `status`) VALUE (#{name},#{address},#{status})
+    </insert>
+
+    <select id="queryAll" resultType="com.gcc.oa.dto.response.DepartmentRespDTO">
+        SELECT dep_id,
+               name,
+               address,
+               status
+        FROM department
+        WHERE status = 1
+    </select>
+
+</mapper>
+

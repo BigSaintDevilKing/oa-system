@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gcc.oa.dao.RolePermissionDao">
+
+    <resultMap type="com.gcc.oa.entity.RolePermission" id="RolePermissionMap">
+        <result property="rolePermissionId" column="role_permission_id" jdbcType="INTEGER"/>
+        <result property="roleId" column="role_id" jdbcType="INTEGER"/>
+        <result property="permissionId" column="permission_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryByRoleId" resultType="integer">
+        select permission_id
+        from role_permission
+        where role_id = #{roleId}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from role_permission
+        <where>
+            <if test="rolePermissionId != null">
+                and role_permission_id = #{rolePermissionId}
+            </if>
+            <if test="roleId != null">
+                and role_id = #{roleId}
+            </if>
+            <if test="permissionId != null">
+                and permission_id = #{permissionId}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="rolePermissionId" useGeneratedKeys="true">
+        insert into role_permission(role_id, permission_id)
+        values (#{roleId}, #{permissionId})
+    </insert>
+
+    <insert id="insertBatch" useGeneratedKeys="true">
+        insert into role_permission(role_id, permission_id)
+        values
+        <foreach collection="permissionIds" item="entity" separator=",">
+            (#{roleId}, #{entity})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="rolePermissionId" useGeneratedKeys="true">
+        insert into role_permission(role_id, permission_id)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.roleId}, #{entity.permissionId})
+        </foreach>
+        on duplicate key update
+        role_id = values(role_id),
+        permission_id = values(permission_id)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update role_permission
+        <set>
+            <if test="roleId != null">
+                role_id = #{roleId},
+            </if>
+            <if test="permissionId != null">
+                permission_id = #{permissionId},
+            </if>
+        </set>
+        where role_permission_id = #{rolePermissionId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteByRoleId">
+        delete
+        from role_permission
+        where role_Id = #{roleId}
+    </delete>
+
+    <resultMap type="com.gcc.oa.dto.response.RolePermissionRespDTO" id="queryModelByRoleId">
+        <result property="permissionId" column="permission_id" jdbcType="INTEGER"/>
+        <association property="permissionRespDTO"
+                     javaType="com.gcc.oa.dto.response.PermissionRespDTO"
+                     select="com.gcc.oa.dao.PermissionDao.queryById"
+                     column="permission_id"/>
+    </resultMap>
+    <select id="queryModelByRoleId" resultMap="queryModelByRoleId">
+        SELECT `role_permission_id`, `role_id`, `permission_id`
+        FROM `role_permission`
+        WHERE `role_id` = #{roleId}
+    </select>
+</mapper>
+

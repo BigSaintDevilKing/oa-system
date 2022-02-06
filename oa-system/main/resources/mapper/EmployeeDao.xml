@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gcc.oa.dao.EmployeeDao">
+
+    <resultMap type="com.gcc.oa.entity.Employee" id="EmployeeMap">
+        <result property="emId" column="em_id" jdbcType="INTEGER"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="loginName" column="login_name" jdbcType="VARCHAR"/>
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap type="com.gcc.oa.dto.response.EmployeeRespDTO" id="Login">
+        <id property="emId" column="em_id" jdbcType="INTEGER"/>
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <association property="department" column="dep_id" select="com.gcc.oa.dao.DepartmentDao.queryById"/>
+        <association property="position" column="position_id" select="com.gcc.oa.dao.PositionDao.queryById"/>
+    </resultMap>
+    <select id="queryByUsernameAndPwd" resultMap="Login">
+        SELECT em_id, password, name, login_name, dep_id, position_id, status
+        FROM employee
+        WHERE status = 1
+          AND BINARY login_name = #{loginName}
+          AND password = #{password}
+    </select>
+
+    <resultMap type="com.gcc.oa.dto.response.EmployeeRespDTO" id="queryPageList">
+        <id property="emId" column="em_id" jdbcType="INTEGER"/>
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <association property="department" column="dep_id" select="com.gcc.oa.dao.DepartmentDao.queryById"/>
+        <association property="position" column="position_id" select="com.gcc.oa.dao.PositionDao.queryById"/>
+    </resultMap>
+    <select id="queryPageList" resultMap="queryPageList">
+        SELECT em_id, password, name, login_name, dep_id, position_id, status
+        FROM employee ${ew.customSqlSegment}
+    </select>
+
+    <resultMap type="com.gcc.oa.dto.response.EmployeeRespDTO" id="queryById">
+        <id property="emId" column="em_id" jdbcType="INTEGER"/>
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <association property="department" column="dep_id" select="com.gcc.oa.dao.DepartmentDao.queryById"/>
+        <association property="position" column="position_id" select="com.gcc.oa.dao.PositionDao.queryById"/>
+    </resultMap>
+    <select id="queryById" resultMap="queryById">
+        SELECT em_id, password, name, login_name, dep_id, position_id, status
+        FROM employee
+        WHERE em_id = #{emId}
+    </select>
+
+    <select id="queryByLoginName" resultType="com.gcc.oa.dto.response.EmployeeRespDTO">
+        SELECT em_id, password, name, login_name, dep_id, position_id, status
+        FROM employee
+        WHERE login_name = #{loginName}
+    </select>
+
+    <update id="updateStatusToOFF">
+        UPDATE employee
+        SET `status` = 0
+        WHERE em_id = #{emId}
+    </update>
+
+    <update id="updateStatusToON">
+        UPDATE employee
+        SET `status` = 1
+        WHERE em_id = #{emId}
+    </update>
+
+    <insert id="addEmployee">
+        INSERT INTO employee (password, name, login_name, dep_id, position_id, status) value (#{password},#{name},#{loginName},#{depId},#{positionId},#{status})
+    </insert>
+
+    <update id="updateEmployee">
+        UPDATE employee
+        SET name        = #{name},
+            dep_id      = #{depId},
+            login_name  = #{loginName},
+            position_id = #{positionId},
+            status      = #{status}
+        WHERE em_Id = #{emId}
+    </update>
+
+
+    <select id="queryPasswordByUsername" resultType="java.lang.String">
+        select password
+        from employee
+        where login_name = #{loginName}
+    </select>
+
+    <resultMap type="com.gcc.oa.dto.response.EmployeeRespDTO" id="queryUserByLoginName">
+        <id property="emId" column="em_id" jdbcType="INTEGER"/>
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <association property="department" column="dep_id" select="com.gcc.oa.dao.DepartmentDao.queryById"/>
+        <association property="position" column="position_id" select="com.gcc.oa.dao.PositionDao.queryById"/>
+    </resultMap>
+    <select id="queryUserInfoByLoginName" resultMap="queryUserByLoginName">
+        select em_id, name, login_name, dep_id, position_id, status
+        from employee
+        where login_name = #{loginName}
+    </select>
+
+</mapper>
+

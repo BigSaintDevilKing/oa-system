@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gcc.oa.dao.PositionDao">
+
+    <resultMap type="com.gcc.oa.dto.response.PositionRespDTO" id="PositionMap">
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <result property="positionName" column="position_name" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="addPosition">
+        INSERT INTO `position` (`position_name`, `create_time`, `status`) VALUE (#{positionName},NOW(),#{status})
+    </insert>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PositionMap">
+        SELECT position_id,
+               position_name,
+               create_time,
+               status
+        FROM position
+        WHERE position_id = #{positionId}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryPageList" resultType="com.gcc.oa.dto.response.PositionRespDTO">
+        SELECT `position_id`, `position_name`, `create_time`, `status`
+        FROM `position` ${ew.customSqlSegment}
+    </select>
+
+    <!--修改状态为0-->
+    <update id="updateStatusToOFF">
+        UPDATE `position`
+        SET `status` = 0
+        WHERE `position_id` = #{positionId}
+    </update>
+
+    <!--修改状态为1-->
+    <update id="updateStatusToON">
+        UPDATE `position`
+        SET `status` = 1
+        WHERE `position_id` = #{positionId}
+    </update>
+
+    <!--修改表的属性-->
+    <update id="updatePosition">
+        UPDATE `position`
+        SET `position_name` = #{positionName},
+            `status`        = #{status}
+        WHERE `position_id` = #{positionId}
+    </update>
+
+    <select id="queryAll" resultType="com.gcc.oa.dto.response.PositionRespDTO">
+        SELECT position_id,
+               position_name,
+               create_time,
+               status
+        FROM position
+        WHERE status = 1
+    </select>
+
+</mapper>
+
